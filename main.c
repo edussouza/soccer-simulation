@@ -6,6 +6,59 @@
 //#include "jogo.h"
 //#include "campeonato.h"
 
+#define getName(var)  #var
+
+// média de gols do Campeonato Brasileiro 2022
+// 905 gols / 380 jogos = 2,38 gols
+
+#define PROB 0.0264444
+// probabilidade de um gol acontecer em um dos 90 minutos -> 2,38/90 = 0,027
+
+typedef enum {									// enum que define os nomes dos times
+	AMERICAMINEIRO,
+	ATHELTICOPR,
+	ATLETICOMG,
+	BAHIA,
+	BOTAFOGO, 
+	BRAGANTINO,
+	CORINTHIANS, 
+	CORITIBA,
+	CRUZEIRO,
+	CUIABA,
+	FLAMENGO,
+	FLUMINENSE,
+	FORTALEZA,
+	GOIAS,
+	GREMIO,
+	INTERNACIONAL,
+	PALMEIRAS,
+	SANTOS,
+	SAOPAULO,
+	VASCO,
+} nomeTimes;
+static const char *const nome_Times[] = {		// transforma os enum para String
+	[AMERICAMINEIRO] = "America-MG",
+	[ATHELTICOPR] = "Athletico-PR",
+	[ATLETICOMG] = "Atletico-MG",
+	[BAHIA] = "Bahia",
+	[BOTAFOGO] = "Botafogo",
+	[BRAGANTINO] = "Bragantino",
+	[CORINTHIANS] = "Corinthians",
+	[CORITIBA] = "Coritiba",
+	[CRUZEIRO] = "Cruzeiro",
+	[CUIABA] = "Cuiaba",
+	[FLAMENGO] = "Flamengo",
+	[FLUMINENSE] = "Fluminense",
+	[FORTALEZA] = "Fortaleza",
+	[GOIAS] = "Goias",
+	[GREMIO] = "Gremio",
+	[INTERNACIONAL] = "Internacional",
+	[PALMEIRAS] = "Palmeiras",
+	[SANTOS] = "Santos",
+	[SAOPAULO] = "Sao Paulo",
+	[VASCO] = "Vasco",
+};
+
 typedef struct {
     int pontuacao;
     int posicao;
@@ -26,24 +79,23 @@ typedef struct {
 // posição 1 do vetor placar[] representa os gols do time visitante
 // posição 2 do vetor placar[] representa o total de gols do jogo
 
+typedef struct{
+	Jogo vet[9];
+} Rodada;
+// para cada posição do vetor, tera um jogo, configurando os 10 jogos de cada rodada
+
 typedef struct {
-    Jogo vet[380];    
+    Rodada rodadas[10];
+	Time vet[20];    
 } Campeonato;
-// para cada uma das posições do vetor vet[], ocorrerá uma chamada da função simulaPartida
-
-#define getName(var)  #var
-
-// média de gols do Campeonato Brasileiro 2022
-// 905 gols / 380 jogos = 2,38 gols
-
-#define PROB 0.027
-// probabilidade de um gol acontecer em um dos 90 minutos -> 2,38/90 = 0,027
+// para cada uma das posições do vetor vet[], acontecera uma rodada
 
 //interface
 void simulaPartida(Time*, Time*, Jogo*);
 void mostraInfoTime(Time, int);
 Time inicializaDados(Time*, char[]);
 void mostraPlacar(Jogo);
+Campeonato criaCampeonato();
 
 //-------------------------------------------------------------------------------------------//
 
@@ -60,13 +112,15 @@ void simulaPartida(Time* A, Time* B, Jogo* x){
     x->visitante = *B;
 
     int minuto;
+    
+    srand(time(NULL));
 
     for(minuto = 1; minuto <= 90; minuto++){
     	
     	float probA = (float)rand() / RAND_MAX; // calcula um número de 0 a 1 para o time A
-        printf("PROBA : %f\n", probA);
+        //printf("PROBA : %f\n", probA);
         float probB = (float)rand() / RAND_MAX; // calcula um número de 0 a 1 para o time B
-        printf("PROBb : %f\n", probB);
+        //printf("PROBb : %f\n", probB);
         
 
         if(PROB >= probA){  // time A marcou gol    
@@ -124,7 +178,6 @@ void mostraInfoTime(Time A, int len) {
     printf("\n");
 }
 
-
 Time inicializaDados(Time *A, char nome[]) {
 	memcpy(A->nome, nome, 15);
     A->derrotas = 0;
@@ -144,10 +197,32 @@ void mostraPlacar(Jogo x){
 	
 }
 
+Campeonato criaCampeonato(){
+	
+	Campeonato x;
+		
+	int i = 0;
+	
+	for(i; i<= 20; i++){
+		
+		memset(x.vet[i].nome, 0, sizeof(x.vet[i].nome));
+		strcpy(x.vet[i].nome, nome_Times[i + 1]);
+		printf("\n%s", x.vet[i].nome);	
+	}
+	
+	return x;
+	
+}
 
 int main(){
-
-	srand(time(NULL));
+	
+//	Campeonato x = criaCampeonato();
+//	
+//	for(int i = 0; i <=20; i++){
+//		
+//		printf("\n%s", x.vet[i].nome);
+//	}
+	
 	
     Jogo primeiro;
 
@@ -155,7 +230,8 @@ int main(){
     Time um = inicializaDados(&um, sp);
 	
 	char pal[] = "Palmeiras";   
-    Time dois = inicializaDados(&dois, pal);   
+    Time dois = inicializaDados(&dois, pal);
+    
     
      
 //	Time tres;
