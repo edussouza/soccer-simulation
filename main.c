@@ -1,10 +1,10 @@
+#include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 #include <string.h>
-#include <time.h>
-#include <jogo.h>
-#include <campeonato.h>
+#include "equipe.h"
+#include "jogo.h"
+#include "campeonato.h"
 
 #define getName(var)  #var
 
@@ -34,34 +34,34 @@ void simulaPartida(Time* A, Time* B, Jogo* x){
     x->casa = *A;
     x->visitante = *B;
 
-    srand(time(NULL));
-
     int minuto;
 
     for(minuto = 1; minuto <= 90; minuto++){
-
-        float probA = (float)rand() / RAND_MAX; // calcula um número de 0 a 1 para o time A
+    	
+    	float probA = (float)rand() / RAND_MAX; // calcula um número de 0 a 1 para o time A
+        printf("PROBA : %f\n", probA);
         float probB = (float)rand() / RAND_MAX; // calcula um número de 0 a 1 para o time B
+        printf("PROBb : %f\n", probB);
         
 
         if(PROB >= probA){  // time A marcou gol    
     	// atualiza gols dos times
             x->placar[0]++;
-            //printf("Gols A: %d\n", x->placar[0]);
+            printf("Gols A: %d\n", x->placar[0]);
             (A->golsMarcados)++;
-            //printf("Gols Marcados A: %d\n", A->golsMarcados);
+            printf("Gols Marcados A: %d\n", A->golsMarcados);
             (B->golsSofridos)++;
-    		//printf("Gols Sofridos B: %d\n", B->golsSofridos);
+    		printf("Gols Sofridos B: %d\n", B->golsSofridos);
         }
 
         if(PROB >= probB){ // time B marcou gol
             // atualiza gols dos times
             x->placar[1]++;
-            //printf("Gols B: %d\n", x->placar[1]);
+            printf("Gols B: %d\n", x->placar[1]);
             A->golsSofridos = A->golsSofridos + 1;
-            ///printf("Gols Sofridos A: %d\n", A->golsSofridos);
+            printf("Gols Sofridos A: %d\n", A->golsSofridos);
     		B->golsMarcados = B->golsMarcados + 1;
-    		//printf("Gols Marcados B: %d\n", B->golsMarcados);
+    		printf("Gols Marcados B: %d\n", B->golsMarcados);
         }
     }
 
@@ -122,6 +122,8 @@ void mostraPlacar(Jogo x){
 
 int main(){
 
+	srand(time(NULL));
+	
     Jogo primeiro;
 
 	char sp[] = "Sao Paulo";
@@ -129,6 +131,7 @@ int main(){
 	
 	char pal[] = "Palmeiras";   
     Time dois = inicializaDados(&dois, pal);   
+    
      
 //	Time tres;
 //	Time quatro;

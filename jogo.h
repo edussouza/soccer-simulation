@@ -1,6 +1,6 @@
-#ifndef jogo.h
-#define jogo.h
-
+#ifndef jogo
+#define jogo
+ 
 typedef struct {
     Time casa;
     Time visitante;
