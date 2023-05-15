@@ -38,5 +38,6 @@
   "files.associations": {
     "string.h": "c",
     "campeonato.h": "c"
-  }
+  },
+  "cmake.configureOnOpen": true
 }

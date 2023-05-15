@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <pthread.h>
+
 //#include "equipe.h"
 //#include "jogo.h"
 //#include "campeonato.h"
@@ -74,6 +76,8 @@ typedef struct {
     Time casa;
     Time visitante;
     int placar[2];
+    pthread_t thread;
+    int completed;
 } Jogo;
 // posição 0 do vetor placar[] representa os gols do time de casa
 // posição 1 do vetor placar[] representa os gols do time visitante
@@ -96,24 +100,34 @@ void mostraInfoTime(Time, int);
 Time inicializaDados(Time*, char[]);
 void mostraPlacar(Jogo);
 Campeonato criaCampeonato();
+void* simThread(void*);
 
 //-------------------------------------------------------------------------------------------//
 
 // IMPLEMENTAÇÃO FUNÇÕES
 
+void* simThread(void *args){
+    Jogo* jogo = (Jogo*)args;
+    printf("Thread created for match: %s vs %s\n", jogo->casa.nome, jogo->visitante.nome);
+    simulaPartida(&(jogo->casa), &(jogo->visitante), jogo);
+    printf("Match simulation completed: %s %d vs %d %s\n", jogo->casa.nome, jogo->placar[0], jogo->placar[1], jogo->visitante.nome);
+    jogo->completed = 1;
+    return NULL;
+}
+
 void simulaPartida(Time* A, Time* B, Jogo* x){
-// inicializa o placar com 0x0
+    // inicializa o placar com 0x0
     x->placar[0] = 0;
     x->placar[1] = 0;
     x->placar[2] = 0;
 
-// define os times casa/visitante
+    // define os times casa/visitante
     x->casa = *A;
     x->visitante = *B;
 
+    //thread
+
     int minuto;
-    
-    srand(time(NULL));
 
     for(minuto = 1; minuto <= 90; minuto++){
     	
@@ -126,21 +140,21 @@ void simulaPartida(Time* A, Time* B, Jogo* x){
         if(PROB >= probA){  // time A marcou gol    
     	// atualiza gols dos times
             x->placar[0]++;
-            printf("Gols A: %d\n", x->placar[0]);
+            //printf("Gols A: %d\n", x->placar[0]);
             (A->golsMarcados)++;
-            printf("Gols Marcados A: %d\n", A->golsMarcados);
+            //printf("Gols Marcados A: %d\n", A->golsMarcados);
             (B->golsSofridos)++;
-    		printf("Gols Sofridos B: %d\n", B->golsSofridos);
+    		//printf("Gols Sofridos B: %d\n", B->golsSofridos);
         }
 
         if(PROB >= probB){ // time B marcou gol
             // atualiza gols dos times
             x->placar[1]++;
-            printf("Gols B: %d\n", x->placar[1]);
+            //printf("Gols B: %d\n", x->placar[1]);
             A->golsSofridos = A->golsSofridos + 1;
-            printf("Gols Sofridos A: %d\n", A->golsSofridos);
+            //printf("Gols Sofridos A: %d\n", A->golsSofridos);
     		B->golsMarcados = B->golsMarcados + 1;
-    		printf("Gols Marcados B: %d\n", B->golsMarcados);
+    		//printf("Gols Marcados B: %d\n", B->golsMarcados);
         }
     }
 
@@ -163,6 +177,7 @@ void simulaPartida(Time* A, Time* B, Jogo* x){
         B->empates++;
         B->pontuacao++;
     }
+
 
 }
 
@@ -215,6 +230,8 @@ Campeonato criaCampeonato(){
 }
 
 int main(){
+
+    srand(time(NULL));
 	
 //	Campeonato x = criaCampeonato();
 //	
@@ -223,7 +240,6 @@ int main(){
 //		printf("\n%s", x.vet[i].nome);
 //	}
 	
-	
     Jogo primeiro;
 
 	char sp[] = "Sao Paulo";
@@ -231,8 +247,17 @@ int main(){
 	
 	char pal[] = "Palmeiras";   
     Time dois = inicializaDados(&dois, pal);
-    
-    
+
+    Jogo segundo;
+
+    char cor[] = "Corinthians";
+    Time tres = inicializaDados(&tres, cor);
+
+    char san[] = "Santos";
+    Time quatro = inicializaDados(&quatro, san);
+
+    segundo.casa = tres;
+    segundo.visitante = quatro;
      
 //	Time tres;
 //	Time quatro;
@@ -253,13 +278,26 @@ int main(){
 //	Time dezenove;
 //	Time vinte;
 
-    simulaPartida(&um, &dois, &primeiro);
-    
-    mostraInfoTime(um, strlen(um.nome));
-    mostraInfoTime(dois, strlen(dois.nome));
-    
+    pthread_t threads[2];
+
+    printf("\n---------------------PrimeiroJogo-------------------");
+
+    //simulaPartida(&um, &dois, &primeiro);
+    pthread_create(&(primeiro.thread), NULL, simThread, &primeiro);
+    // mostraInfoTime(um, strlen(um.nome));
+    // mostraInfoTime(dois, strlen(dois.nome));    
     mostraPlacar(primeiro);
-	
-    
-	return 0;
+
+    printf("\n---------------------SegundoJogo-------------------");
+
+    //simulaPartida(&tres, &quatro, &segundo);
+    pthread_create(&(segundo.thread), NULL, simThread, &segundo);  
+    // mostraInfoTime(tres, strlen(tres.nome));
+    // mostraInfoTime(quatro, strlen(quatro.nome));
+    mostraPlacar(segundo);
+
+    pthread_join(primeiro.thread, NULL);
+    pthread_join(segundo.thread, NULL);
+
+    return 0;
 }
