@@ -2,9 +2,34 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "equipe.h"
-#include "jogo.h"
-#include "campeonato.h"
+//#include "equipe.h"
+//#include "jogo.h"
+//#include "campeonato.h"
+
+typedef struct {
+    int pontuacao;
+    int posicao;
+    int vitorias;
+    int empates;
+    int derrotas;
+    int golsMarcados;
+    int golsSofridos;
+    char nome[15];
+} Time;
+
+typedef struct {
+    Time casa;
+    Time visitante;
+    int placar[2];
+} Jogo;
+// posição 0 do vetor placar[] representa os gols do time de casa
+// posição 1 do vetor placar[] representa os gols do time visitante
+// posição 2 do vetor placar[] representa o total de gols do jogo
+
+typedef struct {
+    Jogo vet[380];    
+} Campeonato;
+// para cada uma das posições do vetor vet[], ocorrerá uma chamada da função simulaPartida
 
 #define getName(var)  #var
 
