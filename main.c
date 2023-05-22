@@ -12,7 +12,7 @@
 // 905 gols / 380 jogos = 2,38 gols
 
 #define PROB 0.0264444
-// probabilidade de um gol acontecer em um dos 90 minutos -> 2,38/90 = 0,027
+// probabilidade de um gol acontecer em um dos 90 minutos -> 2,38/90 = 0,024
 
 typedef enum {									// enum que define os nomes dos times
 	AMERICAMINEIRO,
@@ -36,6 +36,7 @@ typedef enum {									// enum que define os nomes dos times
 	SAOPAULO,
 	VASCO,
 } nomeTimes;
+
 static const char *const nome_Times[] = {		// transforma os enum para String
 	[AMERICAMINEIRO] = "America-MG",
 	[ATHELTICOPR] = "Athletico-PR",
@@ -67,7 +68,7 @@ typedef struct {
     int derrotas;
     int golsMarcados;
     int golsSofridos;
-    char nome[15];
+    char nome[40];
 } Time;
 
 typedef struct {
@@ -86,7 +87,8 @@ typedef struct{
 
 typedef struct {
     Rodada rodadas[10];
-	Time vet[20];    
+	Time tab[20];
+    Time chaves[20];    
 } Campeonato;
 // para cada uma das posições do vetor vet[], acontecera uma rodada
 
@@ -112,8 +114,6 @@ void simulaPartida(Time* A, Time* B, Jogo* x){
     x->visitante = *B;
 
     int minuto;
-    
-    srand(time(NULL));
 
     for(minuto = 1; minuto <= 90; minuto++){
     	
@@ -126,21 +126,21 @@ void simulaPartida(Time* A, Time* B, Jogo* x){
         if(PROB >= probA){  // time A marcou gol    
     	// atualiza gols dos times
             x->placar[0]++;
-            printf("Gols A: %d\n", x->placar[0]);
+            //printf("Gols A: %d\n", x->placar[0]);
             (A->golsMarcados)++;
-            printf("Gols Marcados A: %d\n", A->golsMarcados);
+            //printf("Gols Marcados A: %d\n", A->golsMarcados);
             (B->golsSofridos)++;
-    		printf("Gols Sofridos B: %d\n", B->golsSofridos);
+    		//printf("Gols Sofridos B: %d\n", B->golsSofridos);
         }
 
         if(PROB >= probB){ // time B marcou gol
             // atualiza gols dos times
             x->placar[1]++;
-            printf("Gols B: %d\n", x->placar[1]);
+            //printf("Gols B: %d\n", x->placar[1]);
             A->golsSofridos = A->golsSofridos + 1;
-            printf("Gols Sofridos A: %d\n", A->golsSofridos);
+            //printf("Gols Sofridos A: %d\n", A->golsSofridos);
     		B->golsMarcados = B->golsMarcados + 1;
-    		printf("Gols Marcados B: %d\n", B->golsMarcados);
+    		//printf("Gols Marcados B: %d\n", B->golsMarcados);
         }
     }
 
@@ -168,6 +168,7 @@ void simulaPartida(Time* A, Time* B, Jogo* x){
 
 void mostraInfoTime(Time A, int len) {
     printf("\n");
+    printf("--------------------------------");
     printf("TIME: %.*s\n", len, A.nome);
     printf("Pontuacao: %d\n", A.pontuacao);
     printf("Vitorias: %d\n", A.vitorias);
@@ -175,6 +176,7 @@ void mostraInfoTime(Time A, int len) {
     printf("Empates: %d\n", A.empates);
     printf("Gols Marcados: %d\n", A.golsMarcados);
     printf("Gols Sofridos: %d\n", A.golsSofridos);
+    printf("--------------------------------");
     printf("\n");
 }
 
@@ -192,8 +194,9 @@ Time inicializaDados(Time *A, char nome[]) {
 
 void mostraPlacar(Jogo x){
 	printf("-----------------------------------");
+    printf("\n%s X %s", x.casa.nome, x.visitante.nome);
 	printf("\n%d X %d", x.placar[0], x.placar[1]);
-	printf("\nTotal de Gols: %d", x.placar[0] + x.placar[1]);
+	printf("\nTotal de Gols: %d\n", x.placar[0] + x.placar[1]);
 	
 }
 
@@ -203,11 +206,12 @@ Campeonato criaCampeonato(){
 		
 	int i = 0;
 	
-	for(i; i<= 20; i++){
+	for(i; i< 20; i++){
 		
-		memset(x.vet[i].nome, 0, sizeof(x.vet[i].nome));
-		strcpy(x.vet[i].nome, nome_Times[i + 1]);
-		printf("\n%s", x.vet[i].nome);	
+		memset(x.tab[i].nome, 0, sizeof(x.tab[i].nome));
+        strcpy(x.tab[i].nome, nome_Times[i]);
+        inicializaDados(&x.tab[i], x.tab[i].nome);
+		//printf("\n%s", x.vet[i - 1].nome);	
 	}
 	
 	return x;
@@ -215,50 +219,29 @@ Campeonato criaCampeonato(){
 }
 
 int main(){
-	
-//	Campeonato x = criaCampeonato();
-//	
-//	for(int i = 0; i <=20; i++){
-//		
-//		printf("\n%s", x.vet[i].nome);
-//	}
-	
-	
-    Jogo primeiro;
 
-	char sp[] = "Sao Paulo";
-    Time um = inicializaDados(&um, sp);
+    srand(time(NULL));
 	
-	char pal[] = "Palmeiras";   
-    Time dois = inicializaDados(&dois, pal);
+	Campeonato x = criaCampeonato();
     
-    
-     
-//	Time tres;
-//	Time quatro;
-//	Time cinco;
-//	Time seis;
-//	Time sete;
-//	Time oito;
-//	Time nove;
-//	Time dez;
-//	Time onze;
-//	Time doze;
-//	Time treze;
-//	Time quatorze;
-//	Time quinze;
-//	Time dezesseis;
-//	Time dezessete;
-//	Time dezoito;
-//	Time dezenove;
-//	Time vinte;
+    simulaPartida(&x.tab[0], &x.tab[1], &x.rodadas->vet[0]);
 
-    simulaPartida(&um, &dois, &primeiro);
+    mostraPlacar(x.rodadas->vet[0]);
+	
+    // Jogo primeiro;
+
+	// char sp[] = "Sao Paulo";
+    // Time um = inicializaDados(&um, sp);
+	
+	// char pal[] = "Palmeiras";   
+    // Time dois = inicializaDados(&dois, pal);
+
+    // simulaPartida(&um, &dois, &primeiro);
     
-    mostraInfoTime(um, strlen(um.nome));
-    mostraInfoTime(dois, strlen(dois.nome));
+    // mostraInfoTime(um, strlen(um.nome));
+    // mostraInfoTime(dois, strlen(dois.nome));
     
-    mostraPlacar(primeiro);
+    // mostraPlacar(primeiro);
 	
     
 	return 0;
