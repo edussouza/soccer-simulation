@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 //#include "equipe.h"
 //#include "jogo.h"
 //#include "campeonato.h"
@@ -69,6 +70,7 @@ typedef struct {
     int golsMarcados;
     int golsSofridos;
     char nome[40];
+    int v[2];
 } Time;
 
 typedef struct {
@@ -88,7 +90,7 @@ typedef struct{
 typedef struct {
     Rodada rodadas[10];
 	Time tab[20];
-    Time chaves[20];    
+    Time chaves[380][2];    
 } Campeonato;
 // para cada uma das posições do vetor vet[], acontecera uma rodada
 
@@ -98,6 +100,7 @@ void mostraInfoTime(Time, int);
 Time inicializaDados(Time*, char[]);
 void mostraPlacar(Jogo);
 Campeonato criaCampeonato();
+bool isDrawn(Time, int);
 
 //-------------------------------------------------------------------------------------------//
 
@@ -182,6 +185,8 @@ void mostraInfoTime(Time A, int len) {
 
 Time inicializaDados(Time *A, char nome[]) {
 	memcpy(A->nome, nome, 15);
+    A->v[0] = 0;
+    A->v[1] = 0;
     A->derrotas = 0;
     A->empates = 0;
     A->golsMarcados = 0;
@@ -190,6 +195,18 @@ Time inicializaDados(Time *A, char nome[]) {
     A->posicao = 0;
     A->vitorias = 0;
     return *A;
+}
+
+bool isDrawn(Time A, int jogo){
+
+    bool drawn = false;
+
+    if(A.v[0] == jogo || A.v[1] == jogo){
+        drawn = true;
+    }
+
+    return drawn;
+
 }
 
 void mostraPlacar(Jogo x){
@@ -205,7 +222,8 @@ Campeonato criaCampeonato(){
 	Campeonato x;
 		
 	int i = 0;
-	
+
+    // inicializa nomes dos times
 	for(i; i< 20; i++){
 		
 		memset(x.tab[i].nome, 0, sizeof(x.tab[i].nome));
@@ -213,7 +231,32 @@ Campeonato criaCampeonato(){
         inicializaDados(&x.tab[i], x.tab[i].nome);
 		//printf("\n%s", x.vet[i - 1].nome);	
 	}
-	
+
+    Time aux[20];
+
+    // cria lista auxiliar
+    for(i = 0; i < 20; i++){
+        aux[i] = x.tab[1];
+    }
+
+    // Embaralhar os times usando o algoritmo de Fisher-Yates
+    for (int i = 20; i > 0; i--) {
+        int j = rand() % (i + 1);
+        Time temp = x.tab[i];
+        aux[i] = x.tab[j];
+        aux[j] = temp;
+    }
+
+    // Gerar a ordem dos jogos
+    int jogo = 0;
+    for (int i = 0; i < 20; i++) {
+        for (int j = i + 1; j < 20; j++) {
+            x.chaves[jogo][0] = aux->tab[i];
+            x.chaves[jogo][1] = aux->tab[j];
+            jogo++;
+        }
+    }
+
 	return x;
 	
 }
